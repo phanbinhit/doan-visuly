@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Trạng thái đăng nhập</title>
+  <script defer src="/__/firebase/7.14.0/firebase-app.js"></script>
+  <script defer src="/__/firebase/7.14.0/firebase-auth.js"></script>
+  <script defer src="/__/firebase/7.14.0/firebase-database.js"></script>
+  <script defer src="/__/firebase/7.14.0/firebase-firestore.js"></script>
+  <script defer src="/__/firebase/7.14.0/firebase-messaging.js"></script>
+  <script defer src="/__/firebase/7.14.0/firebase-storage.js"></script>
+  <script defer src="/__/firebase/init.js"></script>
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+</head>
+<body>
+  <div class="container1">
+    <span id="title">STATUS</span>
+    <span id="time"></span>
+    <span id="status">OPEN</span>
+    <div class="container2">
+      <span id="text">History</span>
+      <select id="list"></select>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      var now = moment().format('MMMM Do YYYY, h:mm:ss a');
+      var time = document.getElementById('time');
+      var btn = document.getElementById('text');
+      var db = firebase.firestore();
+      var stt = document.getElementById('status');
+      var list = document.getElementById('list');
+
+      time.innerText = now;
+      createData();
+      onData();
+
+      function onData() {
+        db.collection('history').get().then(function(querySnapshot) {
+          render(querySnapshot.docs);
+        });
+      } 
+
+      function render(items) {
+        var listInner = items.map(function(item) {
+          var sttItem = item.data().status === true ? 'OPEN' : 'CLOSE';
+          return '<option>' + item.data().time + ': '  + sttItem + '</option>';
+        });
+      
+        list.innerHTML = listInner.sort().reverse().join(' ');
+      }
+
+      function createData() {
+        var sttObj = stt.textContent === 'OPEN' ? true : false; 
+        obj = {
+          status: sttObj,
+          time: time.textContent
+        }
+        db.collection('history').add(obj)
+          .then(function(docRef) {
+            console.log(docRef.id);
+          })
+          .catch(function(err) {
+            console.log(err);
+          })
+      }
+    });
+  </script>
+</body>
+</html>
