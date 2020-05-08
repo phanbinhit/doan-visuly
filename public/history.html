@@ -2,15 +2,84 @@
 <html>
 <head>
 	<title>History</title>
-	<link rel="stylesheet" type="text/css" href="./styles.css">
+	<style type="text/css">
+		  *{
+		      padding: 0;
+		      margin: 0;
+		      font-family: sans-serif;
+		    }
+		    body{
+		      background: #000;
+		    }
+		.container{
+			margin: auto;
+			width: 50%;
+			padding: 10px;
+		}
+		.text{
+			display: table;
+			margin: 0 auto;
+			text-align: center;	
+			border: 3px solid white;
+		    cursor: pointer;
+		    border-radius: 5px;
+		    width: 50%;
+		    margin-left: 25%;
+		    font-size: 30px;
+		    background-color: #4db34d;
+		    color: white;		
+		}
+		ul {
+			margin-top: 40px;
+			text-align: center;
+			display: table;
+			list-style: none;
+			margin: 0 auto;
+			text-align: center;
+			color: white;
+			font-size: 18px;
+		}
+		ul li{
+			border: 1px solid white;
+			margin-top: 15px;
+		}
+	</style>
+	<script defer src="/__/firebase/7.14.0/firebase-app.js"></script>
+    <script defer src="/__/firebase/7.14.0/firebase-auth.js"></script>
+    <script defer src="/__/firebase/7.14.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/7.14.0/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/7.14.0/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/7.14.0/firebase-storage.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
 </head>
 <body>
 	<div class="container">
-		<span id="text">History</span>
-		<ul id="list">
-			<li>Phan Than Binh</li>
-			<li>Phan Than Binh</li>
+		<span class="text">History</span>
+		<ul id="list">	
 		</ul>
 	</div>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() {
+			var db = firebase.firestore();
+			var list = document.getElementById('list');
+
+			onData();
+
+            function onData() {
+            	db.collection('history').get().then(function(querySnapshot) {
+            	render(querySnapshot.docs);
+        		});
+      		} 
+
+      		function render(items) {
+	        var listInner = items.map(function(item) {
+	          var sttItem = item.data().status === true ? 'OPEN' : 'CLOSE';
+	          return '<li>' + item.data().time + ': '  + sttItem + '</li>';
+	        });
+	      
+	        list.innerHTML = listInner.sort().reverse().join(' ');
+	      }
+		});
+	</script>
 </body>
 </html>
